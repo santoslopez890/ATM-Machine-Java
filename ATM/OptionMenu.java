@@ -5,10 +5,21 @@ import java.util.InputMismatchException;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 public class OptionMenu {
+	//New logger and File Handler
+	Logger logger = Logger.getLogger("MyLog");
+	//File handler
+	FileHandler fh;
+	//menu input scanner
 	Scanner menuInput = new Scanner(System.in);
+	//money format
 	DecimalFormat moneyFormat = new DecimalFormat("'$'###,##0.00");
+	//Hash map of account number and account
 	HashMap<Integer, Account> data = new HashMap<Integer, Account>();
 
 	public void getLogin() throws IOException {
@@ -181,13 +192,29 @@ public class OptionMenu {
 		System.out.println("\nEnter PIN to be registered");
 		int pin = menuInput.nextInt();
 		data.put(cst_no, new Account(cst_no, pin));
+		//add to file
+		logger.info("Account has been created");
 		System.out.println("\nYour new account has been successfuly registered!");
+
+
 		System.out.println("\nRedirecting to login.............");
 		getLogin();
 	}
 
 	public void mainMenu() throws IOException {
-		data.put(952141, new Account(952141, 191904, 1000, 5000));
+		//Logger
+		try {
+			// This block configure the logger with handler and formatter
+			fh = new FileHandler("ATM/MyLogFile.log");
+			logger.addHandler(fh);
+			SimpleFormatter formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			data.put(952141, new Account(952141, 191904, 1000, 5000));
 		data.put(123, new Account(123, 123, 20000, 50000));
 		boolean end = false;
 		while (!end) {
