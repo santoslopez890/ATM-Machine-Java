@@ -6,7 +6,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.logging.FileHandler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
@@ -59,7 +58,8 @@ public class OptionMenu {
 				System.out.println(" Type 1 - Checking Account");
 				System.out.println(" Type 2 - Savings Account");
 				System.out.println(" Type 3 - View statements of both accounts");
-				System.out.println(" Type 4 - Exit");
+				System.out.println(" Type 4 - Sign into another account");
+				System.out.println(" Type 5 - Exit");
 				System.out.print("\nChoice: ");
 
 				int selection = menuInput.nextInt();
@@ -76,6 +76,9 @@ public class OptionMenu {
 					System.out.println("\nSavings Account Balance: " + moneyFormat.format(acc.getSavingBalance()));
 					break;
 					case 4:
+						mainMenu();
+						break;
+					case 5:
 						end = true;
 						break;
 				default:
@@ -84,6 +87,8 @@ public class OptionMenu {
 			} catch (InputMismatchException e) {
 				System.out.println("\nInvalid Choice.");
 				menuInput.next();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
