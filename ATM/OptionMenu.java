@@ -1,13 +1,10 @@
-import java.io.IOException;
+import java.io.*;
 import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.InputMismatchException;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.FileHandler;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+//Use buffered reader to get information and split info by commas then read the file back into the program
 
 public class OptionMenu {
 	//New logger and File Handler
@@ -20,6 +17,11 @@ public class OptionMenu {
 	DecimalFormat moneyFormat = new DecimalFormat("'$'###,##0.00");
 	//Hash map of account number and account
 	HashMap<Integer, Account> data = new HashMap<Integer, Account>();
+
+	final static String outputFilePath = "ATM/Accounts";
+
+
+
 
 	public void getLogin() throws IOException {
 		boolean end = false;
@@ -197,7 +199,8 @@ public class OptionMenu {
 		System.out.println("\nEnter PIN to be registered");
 		int pin = menuInput.nextInt();
 		data.put(cst_no, new Account(cst_no, pin));
-		//add to file
+
+		addtofile();
 		logger.info("Account has been created");
 		System.out.println("\nYour new account has been successfuly registered!");
 
@@ -207,6 +210,8 @@ public class OptionMenu {
 	}
 
 	public void mainMenu() throws IOException {
+
+		readFromFile();
 		//Logger
 		try {
 			// This block configure the logger with handler and formatter
@@ -249,4 +254,66 @@ public class OptionMenu {
 		menuInput.close();
 		System.exit(0);
 	}
+	public void addtofile(){
+		//add to file
+		File file = new File(outputFilePath);
+		BufferedWriter bf = null;
+		//adds account to properties
+		try {
+
+			// create new BufferedWriter for the output file
+			bf = new BufferedWriter(new FileWriter(file));
+
+			// iterate map entries
+			for (Map.Entry<Integer, Account> entry : data.entrySet()) {
+
+				// put key and value separated by a colon
+				bf.write(entry.getKey() + "," + entry.getValue().getCustomerNumber()+","+entry.getValue().getPinNumber()+","+entry.getValue().getCheckingBalance()+","+entry.getValue().getSavingBalance());
+
+				// new line
+				bf.newLine();
+			}
+
+			bf.flush();
+		}
+		catch (IOException e) {
+			e.printStackTrace();
+		}
+		finally {
+
+			try {
+
+				// always close the writer
+				bf.close();
+			}
+			catch (Exception e) {
+			}
+		}
+	}
+	public void readFromFile(){
+
+		try {
+
+			Scanner fileIn = new Scanner(new File("ATM/Accounts"));
+
+			while (fileIn.hasNextLine())
+			{
+				String line = fileIn.nextLine();
+				String [] accountData=line.split(",");
+				int hashKey= Integer.parseInt(accountData[0]);
+				int customerNumber= Integer.parseInt(accountData[1]);
+				int pinNumber= Integer.parseInt(accountData[2]);
+				double checkingBalance= Double.parseDouble(accountData[3]);
+				double savingBalance= Double.parseDouble(accountData[4]);
+				// Reads the entire line
+				// Output the line
+				data.put(hashKey, new Account(customerNumber, pinNumber, checkingBalance, savingBalance));
+			}
+		}
+		catch (IOException e) {
+			System.out.println("File not found");
+		}
+
+	}
+
 }
